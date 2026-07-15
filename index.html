@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dashboard Solar — INGELAR SRL</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
+<style>
+:root{--navy:#003366;--green:#2e7d32;--blue:#1565c0;--orange:#e65100;
+      --bg:#f0f4f8;--card:#fff;--border:#e2e8f0;--text:#1a202c;--muted:#64748b}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);font-size:14px}
+header{background:var(--navy);color:#fff;padding:15px 30px;display:flex;justify-content:space-between;align-items:center}
+header h1{font-size:1.3rem;font-weight:700}
+header .ts{font-size:.77rem;opacity:.75;margin-top:3px}
+.main{max-width:1500px;margin:0 auto;padding:18px 16px}
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:20px}
+.kpi{background:var(--card);border-radius:10px;padding:16px 20px;box-shadow:0 1px 4px rgba(0,0,0,.08);border-left:4px solid var(--navy)}
+.kpi.green{border-color:var(--green)}.kpi.blue{border-color:var(--blue)}
+.kpi.orange{border-color:var(--orange)}.kpi.red{border-color:#c00}
+.kpi-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:4px}
+.kpi-value{font-size:1.75rem;font-weight:700;line-height:1.1}
+.kpi-sub{font-size:.76rem;color:var(--muted);margin-top:3px}
+.section{background:var(--card);border-radius:10px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:18px}
+.section h2{font-size:.93rem;font-weight:700;margin-bottom:12px;color:var(--navy);border-bottom:2px solid var(--border);padding-bottom:6px}
+.section h3{font-size:.82rem;font-weight:600;color:#555;margin:16px 0 7px}
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.chart-wrap{position:relative}
+.chart-sub{font-size:.8rem;color:#666;margin-bottom:5px;text-align:center}
+@media(max-width:900px){.charts-row{grid-template-columns:1fr}}
+.table-wrap{overflow-x:auto;margin-top:14px}
+table{width:100%;border-collapse:collapse;font-size:.8rem}
+th{background:var(--navy);color:#fff;padding:7px 9px;text-align:center;font-weight:600;font-size:.74rem;white-space:nowrap}
+td{padding:6px 9px;border-bottom:1px solid var(--border);text-align:center;white-space:nowrap}
+tr:hover td{background:#f8fafc}
+tr.offline td{background:#fff1f2;color:#991b1b}
+tr.total-row td{background:#dbeafe;font-weight:700;color:#1e3a8a}
+.no-data{color:var(--muted);font-style:italic;padding:14px 0;text-align:center}
+.note{font-size:.74rem;color:#888;margin-top:5px}
+footer{text-align:center;font-size:.72rem;color:var(--muted);padding:16px}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>&#9728; Dashboard Solar — INGELAR SRL</h1>
+    <div class="ts">Actualizado: 15/07/2026 14:33</div>
+  </div>
+  <div style="font-size:.8rem;opacity:.8">SolisCloud: 2026-07-14</div>
+</header>
+<div class="main">
+
+<div class="kpi-row">
+  <div class="kpi green">
+    <div class="kpi-label">VLP — Total generado</div>
+    <div class="kpi-value">931.2 <span style="font-size:.88rem;font-weight:400">MWh</span></div>
+    <div class="kpi-sub">5 mes(es) · Último día: 10.826 MWh · 51.73 kWh/kWp</div>
+  </div>
+  <div class="kpi blue">
+    <div class="kpi-label">BELLIA — Total generado</div>
+    <div class="kpi-value">11,918 <span style="font-size:.88rem;font-weight:400">kWh</span></div>
+    <div class="kpi-sub">2 mes(es) registrado(s)</div>
+  </div>
+  <div class="kpi orange">
+    <div class="kpi-label">SolisCloud — Total generado</div>
+    <div class="kpi-value">31,254 <span style="font-size:.88rem;font-weight:400">kWh</span></div>
+    <div class="kpi-sub">1 mes(es) · 17 plantas · Hoy: 3,540.5 kWh</div>
+  </div>
+  <div class="kpi red">
+    <div class="kpi-label">SolisCloud — Offline</div>
+    <div class="kpi-value" style="color:#c00">4</div>
+    <div class="kpi-sub">de 17 plantas · 2026-07-14</div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Comparativa de rendimiento — kWh/kWp por planta/inversor</h2>
+  
+  <p class="note">VLP: acum. Jul 2026 &nbsp;|&nbsp; BELLIA: último mes &nbsp;|&nbsp; SolisCloud: 2026-07-14</p>
+  <div class="chart-wrap" style="height:606px;margin-top:10px"><canvas id="chartCmp"></canvas></div>
+</div>
+
+<div class="section">
+  <h2>PSFV Valle de La Puerta — 2.116,92 kWp</h2>
+  
+  <h3>Generación mensual acumulada</h3>
+  <div class="charts-row">
+    <div>
+      <div class="chart-sub">MWh por mes</div>
+      <div class="chart-wrap" style="height:280px"><canvas id="chartVlpMes"></canvas></div>
+    </div>
+    <div>
+      <div class="chart-sub">kWh/kWp por mes</div>
+      <div class="chart-wrap" style="height:280px"><canvas id="chartVlpEsp"></canvas></div>
+    </div>
+  </div>
+  
+  <h3>Detalle diario — Jul 2026</h3>
+  <div class="chart-wrap" style="height:280px"><canvas id="chartVlpDia"></canvas></div>
+</div>
+
+<div class="section">
+  <h2>Grupo BELLIA — 143,40 kWp</h2>
+  
+  <div class="charts-row">
+    <div>
+      <div class="chart-sub">Generación mensual por inversor (kWh)</div>
+      <div class="chart-wrap" style="height:300px"><canvas id="chartBelliaKwh"></canvas></div>
+    </div>
+    <div>
+      <div class="chart-sub">Generación específica por inversor (kWh/kWp)</div>
+      <div class="chart-wrap" style="height:300px"><canvas id="chartBelliaEsp"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>SolisCloud — Flota de plantas</h2>
+  
+  <h3>Acumulado mensual por planta (kWh)</h3>
+  <div class="chart-wrap" style="height:360px"><canvas id="chartSolisMes"></canvas></div>
+  <div class="table-wrap">
+    <table style="font-size:.77rem"><thead><tr><th>Planta</th><th>2026-07</th><th>Total</th></tr></thead><tbody><tr><td style="text-align:left;padding-left:8px;white-space:nowrap">AVE SEIS 50 KW</td><td>897.0</td><td style="font-weight:700">897.0</td></tr><tr><td style="text-align:left;padding-left:8px;white-space:nowrap">CLADAN 150 KW</td><td>3,244.0</td><td style="font-weight:700">3,244.0</td></tr><tr><td style="text-align:left;padding-left:8px;white-space:nowrap">COFLUENTES</td><td>3,914.7</td><td style="font-weight:700">3,914.7</td></tr><tr><td style="text-align:left;padding-left:8px;white-space:nowrap">CTS CRIA 50 KW</td><td>1,504.0</td><td style="font-weight:700">1,504.0</td></tr><tr><td style="text-align:left;padding-left:8px;white-space:nowrap">CTS LA MISION</td><td>0.0</td><td style="font-weight:700">0.0</td></tr><tr><td style="text-align:left;padding-left:8px;white-space:nowrap">CTS PRODUCCIÓN 100KW</td><td>3,000.8</td><td style="font-weight:700">3,000.8</td></tr><tr><td style="text-align:left;padding-left:8px;white-space:nowrap">DOS RIOS EXTRUSORA</td><td>0.0</td><td style="font-weight:700">0.0</td></tr><tr><td style="text-align:left;padding-left:8px;white-space:nowrap">FEPASSA INCUBACIÓN</td><td>4,360.6</td><td style="font-weight:700">4,360.6</td></tr><tr><td style="text-align:left;padding-left:8px;white-space:nowrap">GRANJA ALIMEZCLAS 50 kw</td><td>324.6</td><td style="font-weight:700">324.6</td></tr><tr><td style="text-align:left;padding-left:8px;white-space:nowrap">MOLINO ALIMEZCLAS 180 kw</td><td>2,559.4</td><td style="font-weight:700">2,559.4</td></tr><tr><td style="text-align:left;padding-left:8px;white-space:nowrap">NUTRIFARM FÁBRICA</td><td>0.0</td><td style="font-weight:700">0.0</td></tr><tr><td style="text-align:left;padding-left:8px;white-space:nowrap">PORCAL ENGORDE</td><td>4,501.5</td><td style="font-weight:700">4,501.5</td></tr><tr><td style="text-align:left;padding-left:8px;white-space:nowrap">PORCAL MATERNIDAD</td><td>0.0</td><td style="font-weight:700">0.0</td></tr><tr><td style="text-align:left;padding-left:8px;white-space:nowrap">PORCAL RIEGO</td><td>1,206.3</td><td style="font-weight:700">1,206.3</td></tr><tr><td style="text-align:left;padding-left:8px;white-space:nowrap">ROCAMORA N1</td><td>1,843.0</td><td style="font-weight:700">1,843.0</td></tr><tr><td style="text-align:left;padding-left:8px;white-space:nowrap">ROCAMORA N2</td><td>1,949.0</td><td style="font-weight:700">1,949.0</td></tr><tr><td style="text-align:left;padding-left:8px;white-space:nowrap">ROCAMORA N3</td><td>1,949.5</td><td style="font-weight:700">1,949.5</td></tr><tr class="total-row"><td style="text-align:left;padding-left:8px">TOTAL FLOTA</td><td style='font-weight:700'>31,254.4</td><td style="font-weight:700">31,254.4</td></tr></tbody></table>
+  </div>
+  <p class="note">Valores en kWh</p>
+  
+  <h3>Último día — 2026-07-14</h3>
+  <div class="charts-row">
+    <div>
+      <div class="chart-sub">Generación día por planta (kWh)</div>
+      <div class="chart-wrap" style="height:570px"><canvas id="chartSolisKwh"></canvas></div>
+    </div>
+    <div>
+      <div class="chart-sub">Generación específica (kWh/kWp)</div>
+      <div class="chart-wrap" style="height:570px"><canvas id="chartSolisEsp"></canvas></div>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table style="margin-top:12px">
+      <thead><tr>
+        <th style="text-align:left;padding-left:8px">Planta</th>
+        <th>Estado</th><th>Cap.(kWp)</th><th>Gen.día(kWh)</th>
+        <th>Gen.esp.(kWh/kWp)</th><th>Evaluación</th>
+      </tr></thead>
+      <tbody><tr><td style="text-align:left;padding-left:8px">FEPASSA INCUBACIÓN</td><td>Online</td><td>244.8</td><td>533.5</td><td>2.18</td><td><span style="background:#f3f4f6;color:#111827;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600">Normal</span></td></tr><tr><td style="text-align:left;padding-left:8px">PORCAL ENGORDE</td><td>Online</td><td>159.3</td><td>429.0</td><td>2.69</td><td><span style="background:#f3f4f6;color:#111827;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600">Normal</span></td></tr><tr><td style="text-align:left;padding-left:8px">COFLUENTES</td><td>Online</td><td>212.4</td><td>415.0</td><td>1.95</td><td><span style="background:#f3f4f6;color:#111827;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600">Normal</span></td></tr><tr><td style="text-align:left;padding-left:8px">CLADAN 150 KW</td><td>Online</td><td>162.0</td><td>391.0</td><td>2.41</td><td><span style="background:#f3f4f6;color:#111827;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600">Normal</span></td></tr><tr><td style="text-align:left;padding-left:8px">MOLINO ALIMEZCLAS 180 kw</td><td>Online</td><td>195.4</td><td>375.0</td><td>1.92</td><td><span style="background:#f3f4f6;color:#111827;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600">Normal</span></td></tr><tr><td style="text-align:left;padding-left:8px">CTS PRODUCCIÓN 100KW</td><td>Online</td><td>112.3</td><td>339.0</td><td>3.02</td><td><span style="background:#f3f4f6;color:#111827;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600">Normal</span></td></tr><tr><td style="text-align:left;padding-left:8px">ROCAMORA N3</td><td>Online</td><td>82.3</td><td>215.0</td><td>2.61</td><td><span style="background:#f3f4f6;color:#111827;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600">Normal</span></td></tr><tr><td style="text-align:left;padding-left:8px">ROCAMORA N2</td><td>Online</td><td>82.3</td><td>214.0</td><td>2.60</td><td><span style="background:#f3f4f6;color:#111827;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600">Normal</span></td></tr><tr><td style="text-align:left;padding-left:8px">ROCAMORA N1</td><td>Online</td><td>82.3</td><td>209.0</td><td>2.54</td><td><span style="background:#f3f4f6;color:#111827;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600">Normal</span></td></tr><tr><td style="text-align:left;padding-left:8px">CTS CRIA 50 KW</td><td>Online</td><td>56.2</td><td>173.0</td><td>3.08</td><td><span style="background:#f3f4f6;color:#111827;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600">Normal</span></td></tr><tr><td style="text-align:left;padding-left:8px">PORCAL RIEGO</td><td>Online</td><td>28.1</td><td>118.0</td><td>4.20</td><td><span style="background:#f3f4f6;color:#111827;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600">Destacado</span></td></tr><tr><td style="text-align:left;padding-left:8px">AVE SEIS 50 KW</td><td>Online</td><td>52.6</td><td>106.0</td><td>2.01</td><td><span style="background:#f3f4f6;color:#111827;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600">Normal</span></td></tr><tr><td style="text-align:left;padding-left:8px">GRANJA ALIMEZCLAS 50 kw</td><td>Online</td><td>52.6</td><td>23.0</td><td>0.44</td><td><span style="background:#f3f4f6;color:#111827;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600">CRÍTICO - revisar</span></td></tr><tr class="offline"><td style="text-align:left;padding-left:8px">NUTRIFARM FÁBRICA</td><td>Offline</td><td>157.9</td><td>0.0</td><td>0.00</td><td><span style="background:#fce7f3;color:#9d174d;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600">FUERA DE SERVICIO</span></td></tr><tr class="offline"><td style="text-align:left;padding-left:8px">PORCAL MATERNIDAD</td><td>Offline</td><td>157.9</td><td>0.0</td><td>0.00</td><td><span style="background:#fce7f3;color:#9d174d;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600">FUERA DE SERVICIO</span></td></tr><tr class="offline"><td style="text-align:left;padding-left:8px">DOS RIOS EXTRUSORA</td><td>Offline</td><td>113.3</td><td>0.0</td><td>0.00</td><td><span style="background:#fce7f3;color:#9d174d;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600">FUERA DE SERVICIO</span></td></tr><tr class="offline"><td style="text-align:left;padding-left:8px">CTS LA MISION</td><td>Offline</td><td>219.6</td><td>0.0</td><td>0.00</td><td><span style="background:#fce7f3;color:#9d174d;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600">FUERA DE SERVICIO</span></td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+</div>
+<footer>INGELAR SRL · Sistema de Monitoreo Solar · Actualizado automáticamente cada día</footer>
+
+<script>
+Chart.register(ChartDataLabels);
+const DL  = {anchor:'end',align:'end',clip:false,padding:2,font:{size:9,weight:'600'},color:'#333'};
+const DLH = {anchor:'end',align:'end',clip:false,padding:3,font:{size:9,weight:'600'},color:'#333'};
+
+function barChart(id, labels, datasets, opts) {
+  const ctx = document.getElementById(id);
+  if (!ctx) return;
+  new Chart(ctx, {
+    type: 'bar',
+    data: {labels, datasets},
+    options: Object.assign({
+      responsive:true, maintainAspectRatio:false,
+      layout:{padding:{top:24}},
+      plugins:{
+        legend:{display:false},
+        datalabels:{...DL},
+      },
+      scales:{
+        x:{grid:{display:false},ticks:{font:{size:10}}},
+        y:{grid:{color:'#e2e8f0'},ticks:{font:{size:10}}},
+      }
+    }, opts || {})
+  });
+}
+
+function hBarChart(id, labels, data, colors, fmtFn) {
+  const ctx = document.getElementById(id);
+  if (!ctx) return;
+  new Chart(ctx, {
+    type:'bar',
+    data:{labels, datasets:[{label:'',data,backgroundColor:colors,borderWidth:0,borderRadius:3}]},
+    options:{
+      indexAxis:'y', responsive:true, maintainAspectRatio:false,
+      layout:{padding:{right:56}},
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label:c=>fmtFn(c.parsed.x)}},
+        datalabels:{...DLH, formatter:v=>v>0?fmtFn(v):''},
+      },
+      scales:{
+        x:{grid:{color:'#e2e8f0'},ticks:{font:{size:9}}},
+        y:{grid:{display:false},ticks:{font:{size:9}}},
+      }
+    }
+  });
+}
+
+// ── Datos ──────────────────────────────────────────────────────────────────
+const D = {"cmp_labels": ["VLP (Jul 2026)", "Maestro (BELIA) (Jul 2026)", "Esclavo (BELIA) (Jul 2026)", "30KTL GIUSEPPE (Jul 2026)", "PORCAL RIEGO", "CTS CRIA 50 KW", "CTS PRODUCCIÓN 100KW", "PORCAL ENGORDE", "ROCAMORA N3", "ROCAMORA N2", "ROCAMORA N1", "CLADAN 150 KW", "FEPASSA INCUBACIÓN", "AVE SEIS 50 KW", "COFLUENTES", "MOLINO ALIMEZCLAS 180 kw", "GRANJA ALIMEZCLAS 50 kw", "NUTRIFARM FÁBRICA", "PORCAL MATERNIDAD", "DOS RIOS EXTRUSORA", "CTS LA MISION"], "cmp_vals": [51.73, 44.16, 49.88, 38.27, 4.2, 3.08, 3.02, 2.69, 2.61, 2.6, 2.54, 2.41, 2.18, 2.01, 1.95, 1.92, 0.44, 0.0, 0.0, 0.0, 0.0], "cmp_colors": ["rgba(46,125,50,0.85)", "rgba(46,125,50,0.75)", "rgba(21,101,192,0.75)", "rgba(230,81,0,0.75)", "rgba(14,116,144,0.75)", "rgba(14,116,144,0.75)", "rgba(14,116,144,0.75)", "rgba(14,116,144,0.75)", "rgba(14,116,144,0.75)", "rgba(14,116,144,0.75)", "rgba(14,116,144,0.75)", "rgba(14,116,144,0.75)", "rgba(14,116,144,0.75)", "rgba(14,116,144,0.75)", "rgba(14,116,144,0.75)", "rgba(14,116,144,0.75)", "rgba(14,116,144,0.75)", "rgba(107,114,128,0.7)", "rgba(107,114,128,0.7)", "rgba(107,114,128,0.7)", "rgba(107,114,128,0.7)"], "vlp_m_labels": ["Mar 2026", "Abr 2026", "May 2026", "Jun 2026", "Jul 2026"], "vlp_m_mwh": [10.032, 297.876, 311.446, 202.37, 109.503], "vlp_m_esp": [4.74, 140.71, 147.12, 95.6, 51.73], "vlp_d_labels": ["01/07", "02/07", "03/07", "04/07", "05/07", "06/07", "07/07", "08/07", "09/07", "10/07", "11/07", "12/07", "13/07", "14/07"], "vlp_d_mwh": [2.559, 1.657, 1.937, 2.597, 10.465, 10.798, 10.484, 8.791, 8.925, 10.147, 10.073, 10.129, 10.115, 10.826], "b_meses": ["Jun 2026", "Jul 2026"], "b_maestro_kwh": [1947.0, 2437.0], "b_esclavo_kwh": [2465.0, 2754.0], "b_ktl_kwh": [1053.0, 1263.0], "b_maestro_esp": [35.26, 44.16], "b_esclavo_esp": [44.66, 49.88], "b_ktl_esp": [31.9, 38.27], "s_meses": ["2026-07"], "s_stacked": [{"label": "AVE SEIS 50 KW", "data": [897.0], "backgroundColor": "#1565C0", "borderWidth": 0}, {"label": "CLADAN 150 KW", "data": [3244.0], "backgroundColor": "#2E7D32", "borderWidth": 0}, {"label": "COFLUENTES", "data": [3914.7], "backgroundColor": "#E65100", "borderWidth": 0}, {"label": "CTS CRIA 50 KW", "data": [1504.0], "backgroundColor": "#6A1B9A", "borderWidth": 0}, {"label": "CTS LA MISION", "data": [0.0], "backgroundColor": "#00796B", "borderWidth": 0}, {"label": "CTS PRODUCCIÓN 100KW", "data": [3000.8], "backgroundColor": "#F57F17", "borderWidth": 0}, {"label": "DOS RIOS EXTRUSORA", "data": [0.0], "backgroundColor": "#37474F", "borderWidth": 0}, {"label": "FEPASSA INCUBACIÓN", "data": [4360.6], "backgroundColor": "#AD1457", "borderWidth": 0}, {"label": "GRANJA ALIMEZCLAS 50 kw", "data": [324.6], "backgroundColor": "#0277BD", "borderWidth": 0}, {"label": "MOLINO ALIMEZCLAS 180 kw", "data": [2559.4], "backgroundColor": "#558B2F", "borderWidth": 0}, {"label": "NUTRIFARM FÁBRICA", "data": [0.0], "backgroundColor": "#EF6C00", "borderWidth": 0}, {"label": "PORCAL ENGORDE", "data": [4501.5], "backgroundColor": "#4527A0", "borderWidth": 0}, {"label": "PORCAL MATERNIDAD", "data": [0.0], "backgroundColor": "#00838F", "borderWidth": 0}, {"label": "PORCAL RIEGO", "data": [1206.3], "backgroundColor": "#9E9D24", "borderWidth": 0}, {"label": "ROCAMORA N1", "data": [1843.0], "backgroundColor": "#4E342E", "borderWidth": 0}, {"label": "ROCAMORA N2", "data": [1949.0], "backgroundColor": "#455A64", "borderWidth": 0}, {"label": "ROCAMORA N3", "data": [1949.5], "backgroundColor": "#C62828", "borderWidth": 0}], "s_lbl_ult": ["FEPASSA INCUBACIÓN", "PORCAL ENGORDE", "COFLUENTES", "CLADAN 150 KW", "MOLINO ALIMEZCLAS 180 kw", "CTS PRODUCCIÓN 100KW", "ROCAMORA N3", "ROCAMORA N2", "ROCAMORA N1", "CTS CRIA 50 KW", "PORCAL RIEGO", "AVE SEIS 50 KW", "GRANJA ALIMEZCLAS 50 kw", "NUTRIFARM FÁBRICA", "PORCAL MATERNIDAD", "DOS RIOS EXTRUSORA", "CTS LA MISION"], "s_kwh_ult": [533.5, 429.0, 415.0, 391.0, 375.0, 339.0, 215.0, 214.0, 209.0, 173.0, 118.0, 106.0, 23.0, 0.0, 0.0, 0.0, 0.0], "s_esp_ult": [2.18, 2.69, 1.95, 2.41, 1.92, 3.02, 2.61, 2.6, 2.54, 3.08, 4.2, 2.01, 0.44, 0.0, 0.0, 0.0, 0.0], "s_clr_ult": ["rgba(21,101,192,0.82)", "rgba(21,101,192,0.82)", "rgba(21,101,192,0.82)", "rgba(21,101,192,0.82)", "rgba(21,101,192,0.82)", "rgba(21,101,192,0.82)", "rgba(21,101,192,0.82)", "rgba(21,101,192,0.82)", "rgba(21,101,192,0.82)", "rgba(21,101,192,0.82)", "rgba(21,101,192,0.82)", "rgba(21,101,192,0.82)", "rgba(21,101,192,0.82)", "rgba(107,114,128,0.82)", "rgba(107,114,128,0.82)", "rgba(107,114,128,0.82)", "rgba(107,114,128,0.82)"]};
+
+// ── Comparativa kWh/kWp ─────────────────────────────────────────────────────
+hBarChart('chartCmp', D.cmp_labels, D.cmp_vals, D.cmp_colors, v=>v.toFixed(2)+' kWh/kWp');
+
+// ── VLP mensual ──────────────────────────────────────────────────────────────
+barChart('chartVlpMes', D.vlp_m_labels,
+  [{label:'MWh',data:D.vlp_m_mwh,backgroundColor:'rgba(46,125,50,0.78)',borderColor:'#2e7d32',borderWidth:1,borderRadius:4}],
+  {plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.y.toFixed(1)+' MWh'}},
+    datalabels:{...DL,formatter:v=>v>0?v.toFixed(1):''}},
+   scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'#e2e8f0'},ticks:{font:{size:10}}}}});
+
+barChart('chartVlpEsp', D.vlp_m_labels,
+  [{label:'kWh/kWp',data:D.vlp_m_esp,backgroundColor:'rgba(21,101,192,0.78)',borderColor:'#1565c0',borderWidth:1,borderRadius:4}],
+  {plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.y.toFixed(2)+' kWh/kWp'}},
+    datalabels:{...DL,formatter:v=>v>0?v.toFixed(2):''}},
+   scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'#e2e8f0'},ticks:{font:{size:10}}}}});
+
+// ── VLP diario ───────────────────────────────────────────────────────────────
+(function(){
+  const n = D.vlp_d_labels.length;
+  barChart('chartVlpDia', D.vlp_d_labels,
+    [{label:'MWh',data:D.vlp_d_mwh,backgroundColor:'rgba(46,125,50,0.72)',borderColor:'#2e7d32',borderWidth:1,borderRadius:3}],
+    {layout:{padding:{top:22}},
+     plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.y.toFixed(3)+' MWh'}},
+       datalabels:{...DL,display:n<=25,formatter:v=>v>0?v.toFixed(2):'',font:{size:n>18?7:9,weight:'600'}}},
+     scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'#e2e8f0'},ticks:{font:{size:10}}}}});
+})();
+
+// ── BELLIA kWh ───────────────────────────────────────────────────────────────
+barChart('chartBelliaKwh', D.b_meses, [
+  {label:'50KTL Maestro',data:D.b_maestro_kwh,backgroundColor:'rgba(46,125,50,0.82)',borderColor:'#2E7D32',borderWidth:1,borderRadius:3},
+  {label:'50KTL Esclavo',data:D.b_esclavo_kwh,backgroundColor:'rgba(21,101,192,0.82)',borderColor:'#1565C0',borderWidth:1,borderRadius:3},
+  {label:'30KTL GIUSEPPE',data:D.b_ktl_kwh,backgroundColor:'rgba(230,81,0,0.82)',borderColor:'#E65100',borderWidth:1,borderRadius:3},
+], {layout:{padding:{top:24}},
+    plugins:{legend:{position:'bottom',labels:{font:{size:10}}},
+      tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y.toLocaleString('es-AR')+' kWh'}},
+      datalabels:{...DL,formatter:v=>v>0?v.toLocaleString('es-AR',{maximumFractionDigits:0}):'',font:{size:8,weight:'600'}}},
+    scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'#e2e8f0'},ticks:{font:{size:10},callback:v=>v.toLocaleString('es-AR')}}}});
+
+// ── BELLIA kWh/kWp ───────────────────────────────────────────────────────────
+barChart('chartBelliaEsp', D.b_meses, [
+  {label:'50KTL Maestro',data:D.b_maestro_esp,backgroundColor:'rgba(46,125,50,0.82)',borderColor:'#2E7D32',borderWidth:1,borderRadius:3},
+  {label:'50KTL Esclavo',data:D.b_esclavo_esp,backgroundColor:'rgba(21,101,192,0.82)',borderColor:'#1565C0',borderWidth:1,borderRadius:3},
+  {label:'30KTL GIUSEPPE',data:D.b_ktl_esp,backgroundColor:'rgba(230,81,0,0.82)',borderColor:'#E65100',borderWidth:1,borderRadius:3},
+], {layout:{padding:{top:24}},
+    plugins:{legend:{position:'bottom',labels:{font:{size:10}}},
+      tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y.toFixed(2)+' kWh/kWp'}},
+      datalabels:{...DL,formatter:v=>v>0?v.toFixed(2):'',font:{size:8,weight:'600'}}},
+    scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'#e2e8f0'},ticks:{font:{size:10},callback:v=>v.toFixed(1)}}}});
+
+// ── SolisCloud mensual apilado ────────────────────────────────────────────────
+(function(){
+  const ctx=document.getElementById('chartSolisMes'); if(!ctx) return;
+  new Chart(ctx,{type:'bar',data:{labels:D.s_meses,datasets:D.s_stacked},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:9},boxWidth:12,padding:8}},
+        tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y.toLocaleString('es-AR')+' kWh',
+          footer:items=>'Total: '+items.reduce((s,i)=>s+i.parsed.y,0).toLocaleString('es-AR',{maximumFractionDigits:0})+' kWh'}},
+        datalabels:{display:false}},
+      scales:{x:{stacked:true,grid:{display:false},ticks:{font:{size:10}}},
+              y:{stacked:true,grid:{color:'#e2e8f0'},ticks:{font:{size:10},callback:v=>v.toLocaleString('es-AR')}}}}});
+})();
+
+// ── SolisCloud día kWh ────────────────────────────────────────────────────────
+hBarChart('chartSolisKwh', D.s_lbl_ult, D.s_kwh_ult, D.s_clr_ult, v=>v.toFixed(1)+' kWh');
+
+// ── SolisCloud día kWh/kWp ────────────────────────────────────────────────────
+hBarChart('chartSolisEsp', D.s_lbl_ult, D.s_esp_ult, D.s_clr_ult, v=>v.toFixed(2)+' kWh/kWp');
+</script>
+</body>
+</html>

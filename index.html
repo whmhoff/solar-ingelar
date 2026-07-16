@@ -46,7 +46,7 @@ footer{text-align:center;font-size:.72rem;color:var(--muted);padding:16px}
 <header>
   <div>
     <h1>&#9728; Dashboard Solar — INGELAR SRL</h1>
-    <div class="ts">Actualizado: 16/07/2026 18:28</div>
+    <div class="ts">Actualizado: 16/07/2026 18:33</div>
   </div>
   <div style="font-size:.8rem;opacity:.8">SolisCloud: 2026-07-15</div>
 </header>
@@ -130,11 +130,11 @@ footer{text-align:center;font-size:.72rem;color:var(--muted);padding:16px}
   <div class="charts-row">
     <div>
       <div class="chart-sub">Generación día por planta (kWh)</div>
-      <div class="chart-wrap" style="height:570px"><canvas id="chartSolisKwh"></canvas></div>
+      <div class="chart-wrap" style="height:340px"><canvas id="chartSolisKwh"></canvas></div>
     </div>
     <div>
       <div class="chart-sub">Generación específica (kWh/kWp)</div>
-      <div class="chart-wrap" style="height:570px"><canvas id="chartSolisEsp"></canvas></div>
+      <div class="chart-wrap" style="height:340px"><canvas id="chartSolisEsp"></canvas></div>
     </div>
   </div>
   <div class="table-wrap">
@@ -266,10 +266,24 @@ barChart('chartBelliaEsp', D.b_meses, [
 })();
 
 // ── SolisCloud día kWh ────────────────────────────────────────────────────────
-hBarChart('chartSolisKwh', D.s_lbl_ult, D.s_kwh_ult, D.s_clr_ult, v=>v.toFixed(1)+' kWh');
+barChart('chartSolisKwh', D.s_lbl_ult,
+  [{label:'kWh',data:D.s_kwh_ult,backgroundColor:D.s_clr_ult,borderWidth:1,borderRadius:3}],
+  {layout:{padding:{top:24}},
+   plugins:{legend:{display:false},
+     tooltip:{callbacks:{label:c=>c.parsed.y.toFixed(1)+' kWh'}},
+     datalabels:{...DL,formatter:v=>v>0?v.toFixed(0):'',font:{size:8,weight:'600'}}},
+   scales:{x:{grid:{display:false},ticks:{font:{size:8},maxRotation:45,minRotation:30}},
+           y:{grid:{color:'#e2e8f0'},ticks:{font:{size:9},callback:v=>v.toLocaleString('es-AR')}}}});
 
 // ── SolisCloud día kWh/kWp ────────────────────────────────────────────────────
-hBarChart('chartSolisEsp', D.s_lbl_ult, D.s_esp_ult, D.s_clr_ult, v=>v.toFixed(2)+' kWh/kWp');
+barChart('chartSolisEsp', D.s_lbl_ult,
+  [{label:'kWh/kWp',data:D.s_esp_ult,backgroundColor:D.s_clr_ult,borderWidth:1,borderRadius:3}],
+  {layout:{padding:{top:24}},
+   plugins:{legend:{display:false},
+     tooltip:{callbacks:{label:c=>c.parsed.y.toFixed(2)+' kWh/kWp'}},
+     datalabels:{...DL,formatter:v=>v>0?v.toFixed(2):'',font:{size:8,weight:'600'}}},
+   scales:{x:{grid:{display:false},ticks:{font:{size:8},maxRotation:45,minRotation:30}},
+           y:{grid:{color:'#e2e8f0'},ticks:{font:{size:9},callback:v=>v.toFixed(1)}}}});
 </script>
 </body>
 </html>

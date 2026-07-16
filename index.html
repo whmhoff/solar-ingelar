@@ -46,7 +46,7 @@ footer{text-align:center;font-size:.72rem;color:var(--muted);padding:16px}
 <header>
   <div>
     <h1>&#9728; Dashboard Solar — INGELAR SRL</h1>
-    <div class="ts">Actualizado: 16/07/2026 18:33</div>
+    <div class="ts">Actualizado: 16/07/2026 18:52</div>
   </div>
   <div style="font-size:.8rem;opacity:.8">SolisCloud: 2026-07-15</div>
 </header>
@@ -252,17 +252,17 @@ barChart('chartBelliaEsp', D.b_meses, [
       datalabels:{...DL,formatter:v=>v>0?v.toFixed(2):'',font:{size:8,weight:'600'}}},
     scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'#e2e8f0'},ticks:{font:{size:10},callback:v=>v.toFixed(1)}}}});
 
-// ── SolisCloud mensual apilado ────────────────────────────────────────────────
+// ── SolisCloud mensual agrupado ───────────────────────────────────────────────
 (function(){
   const ctx=document.getElementById('chartSolisMes'); if(!ctx) return;
   new Chart(ctx,{type:'bar',data:{labels:D.s_meses,datasets:D.s_stacked},
     options:{responsive:true,maintainAspectRatio:false,
+      layout:{padding:{top:10}},
       plugins:{legend:{position:'bottom',labels:{font:{size:9},boxWidth:12,padding:8}},
-        tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y.toLocaleString('es-AR')+' kWh',
-          footer:items=>'Total: '+items.reduce((s,i)=>s+i.parsed.y,0).toLocaleString('es-AR',{maximumFractionDigits:0})+' kWh'}},
+        tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y.toLocaleString('es-AR')+' kWh'}},
         datalabels:{display:false}},
-      scales:{x:{stacked:true,grid:{display:false},ticks:{font:{size:10}}},
-              y:{stacked:true,grid:{color:'#e2e8f0'},ticks:{font:{size:10},callback:v=>v.toLocaleString('es-AR')}}}}});
+      scales:{x:{grid:{display:false},ticks:{font:{size:10}}},
+              y:{grid:{color:'#e2e8f0'},ticks:{font:{size:10},callback:v=>v.toLocaleString('es-AR')}}}}});
 })();
 
 // ── SolisCloud día kWh ────────────────────────────────────────────────────────

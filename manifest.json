@@ -1,0 +1,19 @@
+{
+  "name": "Solar INGELAR",
+  "short_name": "Solar INGELAR",
+  "description": "Dashboard de generación solar — INGELAR SRL",
+  "start_url": "/solar-ingelar/",
+  "scope": "/solar-ingelar/",
+  "display": "standalone",
+  "background_color": "#1B5E20",
+  "theme_color": "#1B5E20",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

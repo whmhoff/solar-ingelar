@@ -1,4 +1,4 @@
-const CACHE = 'solar-202610310833';
+const CACHE = 'solar-202611010833';
 self.addEventListener('install', e => { self.skipWaiting(); });
 self.addEventListener('activate', e => {
   e.waitUntil(
